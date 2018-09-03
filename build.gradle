@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.qameta.allure:allure-gradle:2.3"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'io.qameta.allure'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.13'
+    compile group: 'io.qameta.allure', name: 'allure-testng', version: '2.0-BETA21'
+    compile 'ru.qatools.commons:properties:2.0.RC3'
+    compile group: 'com.codeborne', name: 'selenide', version: '4.12.3'
+    compile group: 'org.testng', name: 'testng', version: '6.13'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    compile 'ru.qatools.commons:properties:2.0.RC3'
+    compile group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '2.0.0'
+    compile group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
+}
+
+test {
+    systemProperty "is_remote", System.getProperty("is_remote")
+    systemProperty "remote_url", System.getProperty("remote_url")
+    systemProperty "user_name", System.getProperty("user_name")
+    systemProperty "user_password", System.getProperty("user_password")
+    systemProperty "url", System.getProperty("url")
+    systemProperty "browser", System.getProperty("browser")
+
+    useTestNG(){
+    }
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+    test.outputs.upToDateWhen { false }
+}
+
+task chrome(type: Test) {
+    useTestNG() {
+    }
+    systemProperties['browser'] = 'chrome'
+}
+
+task firefox(type: Test) {
+    useTestNG() {
+    }
+    systemProperties['browser'] = 'firefox'
+}
+
+allure {
+    version = '2.5.0'
+    aspectjweaver = true
+    autoconfigure = true
+    useTestNG {
+        version = '2.0-BETA10'
+    }
+}
+
+wrapper.gradleVersion = '4.9'
